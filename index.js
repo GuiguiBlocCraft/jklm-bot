@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const fs = require('fs')
 const os = require('os')
 
+const config = require('./config.json')
 const Room = require('./src/room')
 const Game = require('./src/game')
 const bombPartyEngine = require('./game/bombparty')
@@ -31,7 +32,7 @@ if(roomCode.length !== 4) {
 
 const settings = {
 	roomCode: process.argv[2]?.toUpperCase(),
-	nickname: "JKLNode",
+	nickname: config.nickname,
 	userToken: getUserToken(),
 	token: null,
 	urlRoom: ""
