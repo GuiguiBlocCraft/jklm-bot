@@ -48,6 +48,13 @@ module.exports = {
 		}
 
 		if((data[0] == 'nextTurn' || data[0] == 'setMilestone' || data[0] == 'failWord') && currentPlayerPeerId === this.settings.selfPeerId && startStep >= 2) {
+			if(data[0] == 'failWord') {
+				console.log(data)
+
+				console.log(`❌ Mot '${lastWord}' refusé par le serveur`)
+				wordsExcluded.push(lastWord)
+			}
+
 			let player = playerStatesByPeerId[currentPlayerPeerId]
 			let wordAnswers = wordlist.filter(str => str.includes(syllable) && !wordsExcluded.includes(str))
 
@@ -61,13 +68,17 @@ module.exports = {
 				wordAnswers.push("/suicide")
 			}
 
+			let settings = this.settings
 			let wordAnswer = wordAnswers[Math.floor(Math.random() * (wordAnswers.length - 1))]
 			let timeIncrement = 0
 
 			for(let n = 1; n <= wordAnswer.length; n++) {
 				timeIncrement += 50 + Math.floor(Math.random() * 200)
 
-				setTimeout(function () {
+				setTimeout(function() {
+					if(currentPlayerPeerId !== settings.selfPeerId)
+						return
+
 					client.emit("setWord", wordAnswer.substring(0, n), false)
 
 					if (n === wordAnswer.length) {
