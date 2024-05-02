@@ -2,10 +2,13 @@ const WebSocketClient = require('websocket').client
 
 class Connection {
 	constructor(settings = null) {
+		this.serverSettings = []
+
 		this.client = new WebSocketClient()
 		this.connection = null
 		this.game = null
 		this.settings = settings ?? {}
+		this.disconnectProperly = false
 		this.on_event = () => {}
 		this.on_ready = () => {}
 		this.on_initialize = () => {}
@@ -16,17 +19,15 @@ class Connection {
 
 		this.client.on('connect', (connection) => {
 			this.connection = connection
+			this.disconnectProperly = false
 
 			if(this.type == 'game') {
 				console.log("Connecté !")
 			}
 
 			connection.on('message', (data) => {
-				// console.log("reçu:", data.utf8Data)
-
 				var message = data.utf8Data
 				var code = parseInt(message)
-				var json = null
 
 				message = message.substring(code.toString().length)
 				var received = message ? JSON.parse(message) : null
@@ -46,6 +47,7 @@ class Connection {
 						break
 					case 41: // Disconnect
 						console.log("Déconnecté par le serveur")
+						this.disconnectProperly = true
 						break
 					case 42: // Events
 						this.on_event(received)
@@ -64,6 +66,11 @@ class Connection {
 		
 			connection.on('close', (code, desc) => {
 				console.log(`Connexion fermée : ${desc} (${code})`)
+
+				if(this.disconnectProperly === false) {
+					console.log("Reconnexion au serveur")
+					this.connect(...this.serverSettings)
+				}
 			})
 		})
 	}
@@ -74,6 +81,7 @@ class Connection {
 
 	connect(url, ...data) {
 		this.client.connect(url.replace('https://', 'wss://') + "/socket.io/?EIO=4&transport=websocket", ...data)
+		this.serverSettings = [url, ...data]
 	}
 
 	emit(...data) {
