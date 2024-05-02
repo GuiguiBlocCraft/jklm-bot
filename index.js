@@ -73,8 +73,11 @@ async function main() {
 					clientGame.connect(settings.urlRoom, null, settings.urlRoom)
 				}
 				break
-			default:
-				console.log('From room:', data)
+			case 'chatterAdded':
+				console.log(`${data[1].nickname} a rejoint le t'chat`)
+				break
+			case 'chatterRemoved':
+				console.log(`${data[1].nickname} a quitté le t'chat`)
 				break
 		}
 	}
@@ -111,8 +114,8 @@ async function main() {
 function on_chat(author, message) {
 	console.log(`${author.nickname}: ${message}`)
 
-	if(message == ".send")
-		clientRoom.emit("chat", "Bonjour ! :D")
+	if(message == ".ping")
+		clientRoom.emit("chat", "Pong ! 🏓")
 	else if(message == ".join")
 		clientGame.emit("joinRound")
 	else if(message == ".left")
