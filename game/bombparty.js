@@ -8,6 +8,7 @@ let currentPlayerPeerId = 0
 let playerStatesByPeerId = {}
 
 let startStep = 0
+let wordsNumber = 0
 
 fetch("https://raw.githubusercontent.com/chrplr/openlexicon/master/datasets-info/Liste-de-mots-francais-Gutenberg/liste.de.mots.francais.frgut.txt")
 	.then(a => a.text())
@@ -35,6 +36,7 @@ module.exports = {
 					console.log("💣 Partie réinitialisée !")
 					wordsExcluded = []
 					startStep = 0
+					wordsNumber = 0
 
 					client.emit("joinRound")
 					return
@@ -92,7 +94,7 @@ module.exports = {
 			let word = lastWord.split('').filter(a => (a.charCodeAt() >= 97 && a.charCodeAt() <= 122) || a == '-').join('')
 
 			wordsExcluded.push(word)
-			console.log(`✅ Mot utilisé : ${word} | ${wordsExcluded.length} mot(s) utilisé(s)`)
+			console.log(`✅ Mot utilisé : ${word} | ${++wordsNumber} mot(s) utilisé(s)`)
 		}
 	}
 }
