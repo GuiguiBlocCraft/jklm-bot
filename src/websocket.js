@@ -26,10 +26,20 @@ class Connection {
 			}
 
 			connection.on('message', (data) => {
+				if(data.binaryData) {
+					this.on_event({ binary: data.binaryData })
+					return
+				}
+
 				var message = data.utf8Data
 				var code = parseInt(message)
 
 				message = message.substring(code.toString().length)
+
+				// Nettoie le JSON au début
+				if(message[0] != '{' && message[0] != '[')
+					message = message.substring(1)
+
 				var received = message ? JSON.parse(message) : null
 
 				switch(code) {
@@ -50,6 +60,7 @@ class Connection {
 						this.disconnectProperly = true
 						break
 					case 42: // Events
+					case 451:
 						this.on_event(received)
 						break
 					case 430:

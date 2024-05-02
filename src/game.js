@@ -12,16 +12,9 @@ class Game extends Connection {
 	}
 
 	call_join() {
-		console.log("Jeu modifié : " + this.gameSelector)
+		console.log("Jeu sélectionné : " + this.gameSelector)
 
-		var json = [
-			'joinGame',
-			this.gameSelector,
-			this.settings.roomCode,
-			this.settings.userToken
-		]
-
-		this.connection.send('42' + JSON.stringify(json))
+		this.emit('joinGame', this.gameSelector, this.settings.roomCode, this.settings.userToken)
 	}
 }
 
