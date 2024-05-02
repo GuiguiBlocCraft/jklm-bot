@@ -62,8 +62,6 @@ async function main() {
 		await new Promise(resolve => clientGame.on_ready = resolve)
 	}
 
-	bombPartyEngine.client = clientGame
-
 	clientRoom.on_event = function(data) {
 		switch(data[0]) {
 			case 'chat':
@@ -92,11 +90,6 @@ async function main() {
 					selfPeerId: data[1].selfPeerId
 				}
 				break
-			case 'setMilestone':
-				bombPartyEngine.settings = {
-					milestone: data[1].milestone
-				}
-				break
 			case 'setRules':
 				datas = Object.getOwnPropertyNames(data[1])
 
@@ -104,6 +97,8 @@ async function main() {
 					bombPartyEngine.settings.rules[d] = data[1][d]
 				}
 				break
+			case 'setMilestone':
+				bombPartyEngine.settings.milestone = data[1]
 			default:
 				if(clientGame.gameSelector == 'bombparty')
 					bombPartyEngine.handler(clientGame, data)
