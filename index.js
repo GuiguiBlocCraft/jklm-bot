@@ -5,11 +5,12 @@ const bodyParser = require('body-parser')
 const fs = require('fs')
 const os = require('os')
 
-const URL_API_ROOT = "https://jklm.fun/api"
-const FILE_TOKEN = os.tmpdir() + '/jklm_token'
-
 const Room = require('./src/room')
 const Game = require('./src/game')
+const bombPartyEngine = require('./game/bombparty')
+
+const URL_API_ROOT = "https://jklm.fun/api"
+const FILE_TOKEN = os.tmpdir() + '/jklm_token'
 
 const clientRoom = new Room()
 const clientGame = new Game()
@@ -22,8 +23,6 @@ const settings = {
 	token: null,
 	urlRoom: ""
 }
-
-var milestone, rules
 
 async function main() {
 	// Adresse du serveur
@@ -63,6 +62,8 @@ async function main() {
 		await new Promise(resolve => clientGame.on_ready = resolve)
 	}
 
+	bombPartyEngine.client = clientGame
+
 	clientRoom.on_event = function(data) {
 		switch(data[0]) {
 			case 'chat':
@@ -81,10 +82,32 @@ async function main() {
 	}
 
 	clientGame.on_event = function(data) {
+		let datas
+
 		switch(data[0]) {
 			case 'setup':
-				milestone = data[1].milestone
-				rules = data[1].rules
+				bombPartyEngine.settings = {
+					milestone: data[1].milestone,
+					rules: data[1].rules,
+					selfPeerId: data[1].selfPeerId
+				}
+				break
+			case 'setMilestone':
+				bombPartyEngine.settings = {
+					milestone: data[1].milestone
+				}
+				break
+			case 'setRules':
+				datas = Object.getOwnPropertyNames(data[1])
+
+				for(let d of datas) {
+					bombPartyEngine.settings.rules[d] = data[1][d]
+				}
+				break
+			default:
+				if(clientGame.gameSelector == 'bombparty')
+					bombPartyEngine.handler(clientGame, data)
+				//else if(clientGame.gameSelector == 'popsauce')
 				break
 		}
 	}
