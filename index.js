@@ -16,8 +16,21 @@ const clientRoom = new Room()
 const clientGame = new Game()
 const app = express()
 
+let roomCode = process.argv[2]?.toUpperCase()
+
+// Argument pour le code
+if(!roomCode) {
+	console.log("Vous devez renseigner le code du salon (doit être sur 4 caractères).")
+	return
+}
+
+if(roomCode.length !== 4) {
+	console.log(`Le code doit faire 4 caractères (${roomCode.length} caractères saisis).`)
+	return
+}
+
 const settings = {
-	roomCode: process.argv[2]?.toUpperCase() ?? 'YVUJ',//Pour les tests
+	roomCode: process.argv[2]?.toUpperCase(),
 	nickname: "JKLNode",
 	userToken: getUserToken(),
 	token: null,
@@ -131,18 +144,18 @@ app.use(function(req, res, next) {
 
 app.post('/captcha', function(req, res) {
 	if(settings.token) {
-		res.status(201).send("Token already set")
+		res.end("Token already set")
 		return
 	}
 
 	settings.token = req.body
 
 	main()
-	res.send()
+	res.end()
 })
 
-app.listen(3000, function() {
-	console.log("Veuillez copier le code pour envoyer le Captcha.")
+app.listen(3000, '127.0.0.1', function() {
+	console.log("Veuillez copier le code situé dans 'client.js' pour envoyer le Captcha.")
 })
 
 function getUserToken() {

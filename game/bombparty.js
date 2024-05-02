@@ -31,7 +31,7 @@ module.exports = {
 				playerStatesByPeerId = this.settings.milestone.playerStatesByPeerId
 				currentPlayerPeerId = this.settings.milestone.currentPlayerPeerId
 
-				if(this.settings.milestone.name == 'seating') {
+				if(this.settings.milestone.name == 'seating' && startStep > 0) {
 					console.log("💣 Partie réinitialisée !")
 					wordsExcluded = []
 					startStep = 0
@@ -49,8 +49,6 @@ module.exports = {
 
 		if((data[0] == 'nextTurn' || data[0] == 'setMilestone' || data[0] == 'failWord') && currentPlayerPeerId === this.settings.selfPeerId && startStep >= 2) {
 			if(data[0] == 'failWord') {
-				console.log(data)
-
 				console.log(`❌ Mot '${lastWord}' refusé par le serveur`)
 				wordsExcluded.push(lastWord)
 			}
