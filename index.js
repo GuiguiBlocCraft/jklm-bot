@@ -17,11 +17,11 @@ const clientRoom = new Room()
 const clientGame = new Game()
 const app = express()
 
-let roomCode = process.argv[2]?.toUpperCase()
+let roomCode = (process.argv[2] ?? process.env.ROOM_CODE)?.toUpperCase()
 
 // Argument pour le code
 if(!roomCode) {
-	console.log("Vous devez renseigner le code du salon (doit être sur 4 caractères).")
+	console.log("Vous devez renseigner le code du salon (doit être sur 4 caractères) dans la variable d'environnement ROOM_CODE.")
 	return
 }
 
@@ -31,7 +31,7 @@ if(roomCode.length !== 4) {
 }
 
 const settings = {
-	roomCode: process.argv[2]?.toUpperCase(),
+	roomCode: roomCode,
 	nickname: config.nickname,
 	userToken: getUserToken(),
 	token: null,
