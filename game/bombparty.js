@@ -1,4 +1,5 @@
 const fetch = require('node-fetch').default
+const delay = require('timers/promises').setTimeout
 
 let wordlist
 let wordsExcluded = []
@@ -17,7 +18,7 @@ fetch("https://raw.githubusercontent.com/chrplr/openlexicon/master/datasets-info
 module.exports = {
 	settings: {},
 
-	handler(client, data) {
+	async handler(client, data) {
 		// Mise à jour des variables
 		switch(data[0]) {
 			case 'nextTurn':
@@ -68,23 +69,19 @@ module.exports = {
 				wordAnswers.push("/suicide")
 			}
 
-			let settings = this.settings
 			let wordAnswer = wordAnswers[Math.floor(Math.random() * (wordAnswers.length - 1))]
-			let timeIncrement = 0
 
 			for(let n = 1; n <= wordAnswer.length; n++) {
-				timeIncrement += 50 + Math.floor(Math.random() * 200)
+				if(currentPlayerPeerId !== this.settings.selfPeerId)
+					return
 
-				setTimeout(function() {
-					if(currentPlayerPeerId !== settings.selfPeerId)
-						return
+				await delay(50 + Math.floor(Math.random() * 200))
 
-					client.emit("setWord", wordAnswer.substring(0, n), false)
+				client.emit("setWord", wordAnswer.substring(0, n), false)
 
-					if (n === wordAnswer.length) {
-						client.emit("setWord", wordAnswer, true)
-					}
-				}, timeIncrement)
+				if (n === wordAnswer.length) {
+					client.emit("setWord", wordAnswer, true)
+				}
 			}
 		}
 
