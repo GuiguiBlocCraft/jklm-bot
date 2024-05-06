@@ -10,6 +10,7 @@ let playerStatesByPeerId = {}
 
 let startStep = 0
 let wordsNumber = 0
+let inGame = false
 
 fetch("https://raw.githubusercontent.com/chrplr/openlexicon/master/datasets-info/Liste-de-mots-francais-Gutenberg/liste.de.mots.francais.frgut.txt")
 	.then(a => a.text())
@@ -33,11 +34,12 @@ module.exports = {
 				playerStatesByPeerId = this.settings.milestone.playerStatesByPeerId
 				currentPlayerPeerId = this.settings.milestone.currentPlayerPeerId
 
-				if(this.settings.milestone.name == 'seating' && startStep > 0) {
+				if(this.settings.milestone.name == 'seating' && startStep > 0 && inGame) {
 					console.log("💣 Partie réinitialisée !")
 					wordsExcluded = []
 					startStep = 0
 					wordsNumber = 0
+					inGame = false
 
 					client.emit("joinRound")
 					return
@@ -50,6 +52,9 @@ module.exports = {
 				break
 		}
 
+		if(startStep > 2)
+			inGame = true
+
 		if((data[0] == 'nextTurn' || data[0] == 'setMilestone' || data[0] == 'failWord') && currentPlayerPeerId === this.settings.selfPeerId && startStep >= 2) {
 			if(data[0] == 'failWord') {
 				console.log(`❌ Mot '${lastWord}' refusé par le serveur`)
@@ -59,7 +64,7 @@ module.exports = {
 			let player = playerStatesByPeerId[currentPlayerPeerId]
 			let wordAnswers = wordlist.filter(str => str.includes(syllable) && !wordsExcluded.includes(str))
 
-			let bonus = 5
+			let bonus = 10
 			let wordAnswersTmp = null
 
 			while(bonus > 0) {
