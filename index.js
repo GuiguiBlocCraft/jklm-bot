@@ -22,7 +22,7 @@ let roomCode = (process.argv[2] ?? process.env.ROOM_CODE)?.toUpperCase()
 
 // Argument pour le code
 if(!roomCode) {
-	console.log("Vous devez renseigner le code du salon (doit être sur 4 caractères) dans la variable d'environnement ROOM_CODE.")
+	console.log("Vous devez renseigner le code du salon (doit être sur 4 caractères) dans la variable d'environnement ROOM_CODE ou en paramètre.")
 	return
 }
 
@@ -169,7 +169,7 @@ const webServer = app.listen(3000, '127.0.0.1', function() {
 })
 
 function getUserToken() {
-	if(fs.existsSync(FILE_TOKEN))
+	if(config.use_same_token && fs.existsSync(FILE_TOKEN))
 		return Buffer.from(fs.readFileSync(FILE_TOKEN, 'ascii'), 'base64').toString('ascii')
 
 	const array = new Uint8Array(16)
@@ -177,11 +177,12 @@ function getUserToken() {
 	let token = ""
 	const digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-"
 
-	for (let i = 0; i < array.length; i++) {
+	for(let i = 0; i < array.length; i++) {
 		token += digits[array[i] % digits.length]
 	}
 
-	fs.writeFileSync(FILE_TOKEN, Buffer.from(token, 'ascii').toString('base64'))
+	if(config.use_same_token)
+		fs.writeFileSync(FILE_TOKEN, Buffer.from(token, 'ascii').toString('base64'))
 
 	return token
 }
