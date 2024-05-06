@@ -9,6 +9,7 @@ const config = require('./config.json')
 const Room = require('./src/room')
 const Game = require('./src/game')
 const bombPartyEngine = require('./game/bombparty')
+const popSauceEngine = require('./game/popsauce')
 
 const URL_API_ROOT = "https://jklm.fun/api"
 const FILE_TOKEN = os.tmpdir() + '/jklm_token'
@@ -101,7 +102,7 @@ async function main() {
 
 		switch(data[0]) {
 			case 'setup':
-				bombPartyEngine.settings = {
+				bombPartyEngine.settings = popSauceEngine.settings = {
 					milestone: data[1].milestone,
 					rules: data[1].rules,
 					selfPeerId: data[1].selfPeerId
@@ -111,15 +112,16 @@ async function main() {
 				datas = Object.getOwnPropertyNames(data[1])
 
 				for(let d of datas) {
-					bombPartyEngine.settings.rules[d] = data[1][d]
+					bombPartyEngine.settings.rules[d] = popSauceEngine.settings.rules[d] = data[1][d]
 				}
 				break
 			case 'setMilestone':
-				bombPartyEngine.settings.milestone = data[1]
+				bombPartyEngine.settings.milestone = popSauceEngine.settings.milestone = data[1]
 			default:
 				if(clientGame.gameSelector == 'bombparty')
 					bombPartyEngine.handler(clientGame, data)
-				//else if(clientGame.gameSelector == 'popsauce')
+				else if(clientGame.gameSelector == 'popsauce')
+					popSauceEngine.handler(clientGame, data)
 				break
 		}
 	}
@@ -144,6 +146,11 @@ app.use(function(req, res, next) {
 })
 
 app.post('/captcha', function(req, res) {
+	if(typeof req.body !== "string") {
+		res.status(400).end()
+		return
+	}
+
 	if(settings.token) {
 		res.end("Token already set")
 		return
@@ -153,9 +160,11 @@ app.post('/captcha', function(req, res) {
 
 	main()
 	res.end()
+
+	webServer.close()
 })
 
-app.listen(3000, '127.0.0.1', function() {
+const webServer = app.listen(3000, '127.0.0.1', function() {
 	console.log("Veuillez copier le code situé dans 'client.js' pour envoyer le Captcha.")
 })
 
