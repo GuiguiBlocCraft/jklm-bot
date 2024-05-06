@@ -59,10 +59,19 @@ module.exports = {
 			let player = playerStatesByPeerId[currentPlayerPeerId]
 			let wordAnswers = wordlist.filter(str => str.includes(syllable) && !wordsExcluded.includes(str))
 
-			let wordAnswersTmp = wordAnswers.filter(str => bonusLetters(player, str))
+			let bonus = 5
+			let wordAnswersTmp = null
 
-			if(wordAnswersTmp.length > 0)
-				wordAnswers = wordAnswersTmp
+			while(bonus > 0) {
+				wordAnswersTmp = wordAnswers.filter(str => bonusLetters(player, str, bonus))
+
+				if(wordAnswersTmp.length > 0) {
+					wordAnswers = wordAnswersTmp
+					break
+				} else {
+					bonus--
+				}
+			}
 
 			if(wordAnswers.length === 0) {
 				console.log(`❌ Aucun mot trouvé concernant la syllabe '${syllable}'`)
@@ -100,9 +109,11 @@ function strNoAccent(str) {
 	return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
-function bonusLetters(player, word) {
+function bonusLetters(player, word, bonus) {
+	var stepBonus = 0
+
 	for (let letter of Object.getOwnPropertyNames(player.bonusLetters)) {
-		if (player.bonusLetters[letter] === 1 && word.includes(letter))
+		if (player.bonusLetters[letter] === 1 && word.includes(letter) && ++stepBonus === bonus)
 			return true
 	}
 
