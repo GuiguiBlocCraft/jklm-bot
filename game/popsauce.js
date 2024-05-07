@@ -1,28 +1,32 @@
+let state = "seating"
+
 module.exports = {
 	settings: {},
 
 	handler(client, data) {
 		// Mise à jour des variables
 		switch(data[0]) {
-			case 'nextTurn':
-				currentPlayerPeerId = data[1]
-				break
 			case 'setMilestone':
-				playerStatesByPeerId = this.settings.milestone.playerStatesByPeerId
-				currentPlayerPeerId = this.settings.milestone.currentPlayerPeerId
-
-				if(this.settings.milestone.name == 'seating' && startStep > 0) {
-					console.log("🥤 Partie réinitialisée !")
-
-					client.emit("joinRound")
-					return
-				} else {
-					startStep++
+				if(!state) {
+					state = this.settings.milestone.name
+					break
 				}
-				break
-			case 'correctWord':
-				playerStatesByPeerId[data[1].playerPeerId] = data[1]
+
+				if(state != this.settings.milestone.name) {
+					if(this.settings.milestone.name == 'seating') {
+						console.log("🥤 Partie réinitialisée !")
+
+						client.emit("joinRound")
+					} else if(this.settings.milestone.name == 'round') {
+						console.log("🥤 La partie a commencé !")
+					}
+
+					state = this.settings.milestone.name
+				}
+
 				break
 		}
+
+		console.log(data)
 	}
 }
