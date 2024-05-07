@@ -9,7 +9,7 @@ let currentPlayerPeerId = 0
 let playerStatesByPeerId = {}
 
 let wordsNumber = 0
-let oldState = ""
+let state = "seating"
 
 fetch("https://raw.githubusercontent.com/chrplr/openlexicon/master/datasets-info/Liste-de-mots-francais-Gutenberg/liste.de.mots.francais.frgut.txt")
 	.then(a => a.text())
@@ -33,15 +33,18 @@ module.exports = {
 				playerStatesByPeerId = this.settings.milestone.playerStatesByPeerId
 				currentPlayerPeerId = this.settings.milestone.currentPlayerPeerId
 
-				if(oldState != this.settings.milestone.name && this.settings.milestone.name == 'seating') {
-					console.log("💣 Partie réinitialisée !")
-					wordsExcluded = []
-					startStep = 0
-					wordsNumber = 0
-					inGame = false
+				if(state != this.settings.milestone.name) {
+					if(this.settings.milestone.name == 'seating') {
+						console.log("💣 Partie réinitialisée !")
+						wordsExcluded = []
+						wordsNumber = 0
 
-					client.emit("joinRound")
-					return
+						client.emit("joinRound")
+					} else if(this.settings.milestone.name == 'round') {
+						console.log("💣 La partie a commencé !")
+					}
+
+					state = this.settings.milestone.name
 				}
 				break
 			case 'correctWord':
@@ -49,7 +52,10 @@ module.exports = {
 				break
 		}
 
-		if((data[0] == 'nextTurn' || data[0] == 'setMilestone' || data[0] == 'failWord') && this.settings.milestone.name == 'round' && currentPlayerPeerId === this.settings.selfPeerId) {
+		if(this.settings.milestone.name == 'seating')
+			return
+
+		if((data[0] == 'nextTurn' || data[0] == 'setMilestone' || data[0] == 'failWord') && currentPlayerPeerId === this.settings.selfPeerId) {
 			if(data[0] == 'failWord') {
 				console.log(`❌ Mot '${lastWord}' refusé par le serveur`)
 				wordsExcluded.push(lastWord)
@@ -83,7 +89,7 @@ module.exports = {
 				if(currentPlayerPeerId !== this.settings.selfPeerId)
 					return
 
-				await delay(50 + Math.floor(Math.random() * 200))
+				await delay(50)
 
 				client.emit("setWord", wordAnswer.substring(0, n), false)
 
@@ -101,8 +107,6 @@ module.exports = {
 			wordsExcluded.push(word)
 			console.log(`✅ Mot utilisé : ${word} | ${++wordsNumber} mot(s) utilisé(s)`)
 		}
-
-		oldState = this.settings.milestone.name
 	}
 }
 
