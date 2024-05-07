@@ -128,13 +128,13 @@ async function main() {
 }
 
 function on_chat(author, message) {
-	console.log(`${author.nickname}: ${message}`)
+	console.log(`(${author.peerId}) ${author.nickname}: ${message}`)
 
 	if(message == ".ping")
 		clientRoom.emit("chat", "Pong ! 🏓")
 	else if(message == ".join")
 		clientGame.emit("joinRound")
-	else if(message == ".left")
+	else if(message == ".leave")
 		clientGame.emit("leaveRound")
 }
 
