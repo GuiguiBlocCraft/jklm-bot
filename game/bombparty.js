@@ -28,10 +28,12 @@ module.exports = {
 			case 'clearUsedWords':
 				wordsExcluded = []
 				break
+			case 'setup':
 			case 'setMilestone':
 				syllable = this.settings.milestone.syllable
 				playerStatesByPeerId = this.settings.milestone.playerStatesByPeerId
 				currentPlayerPeerId = this.settings.milestone.currentPlayerPeerId
+				wordsNumber = this.settings.milestone.usedWordCount ?? 0
 
 				if(state != this.settings.milestone.name) {
 					if(this.settings.milestone.name == 'seating') {

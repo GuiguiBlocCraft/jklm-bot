@@ -98,8 +98,6 @@ async function main() {
 	}
 
 	clientGame.on_event = function(data) {
-		let datas
-
 		switch(data[0]) {
 			case 'setup':
 				bombPartyEngine.settings = popSauceEngine.settings = {
@@ -109,7 +107,7 @@ async function main() {
 				}
 				break
 			case 'setRules':
-				datas = Object.getOwnPropertyNames(data[1])
+				let datas = Object.getOwnPropertyNames(data[1])
 
 				for(let d of datas) {
 					bombPartyEngine.settings.rules[d] = popSauceEngine.settings.rules[d] = data[1][d]
@@ -117,13 +115,13 @@ async function main() {
 				break
 			case 'setMilestone':
 				bombPartyEngine.settings.milestone = popSauceEngine.settings.milestone = data[1]
-			default:
-				if(clientGame.gameSelector == 'bombparty')
-					bombPartyEngine.handler(clientGame, data)
-				else if(clientGame.gameSelector == 'popsauce')
-					popSauceEngine.handler(clientGame, data)
 				break
 		}
+
+		if(clientGame.gameSelector == 'bombparty')
+			bombPartyEngine.handler(clientGame, data)
+		else if(clientGame.gameSelector == 'popsauce')
+			popSauceEngine.handler(clientGame, data)
 	}
 }
 
