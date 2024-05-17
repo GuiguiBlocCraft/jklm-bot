@@ -1,6 +1,19 @@
 const fetch = require('node-fetch').default
 const delay = require('timers/promises').setTimeout
 
+const URLs = {
+	"br": "",
+	"de": "",
+	"de-pokemon": "",
+	"en": "https://raw.githubusercontent.com/dolph/dictionary/master/popular.txt",
+	"en-pokemon": "https://gist.githubusercontent.com/ralts00/31415709fb34c1b2ec556c396efc3d80/raw/516ef1179f10f4a0ecb4f50f118e6757fef85243/pokemon_names.txt",
+	"es": "",
+	"fr": "https://raw.githubusercontent.com/chrplr/openlexicon/master/datasets-info/Liste-de-mots-francais-Gutenberg/liste.de.mots.francais.frgut.txt",
+	"fr-pokemon": "https://raw.githubusercontent.com/SirSkaro/Pokedex/master/src/main/resources/dictionaries/fr/pokemon.txt",
+	"nah": "",
+	"pt-BR": ""
+}
+
 let wordlist
 let wordsExcluded = []
 let lastWord
@@ -10,10 +23,8 @@ let playerStatesByPeerId = {}
 
 let wordsNumber = 0
 let state = "seating"
-
-fetch("https://raw.githubusercontent.com/chrplr/openlexicon/master/datasets-info/Liste-de-mots-francais-Gutenberg/liste.de.mots.francais.frgut.txt")
-	.then(a => a.text())
-	.then(a => wordlist = a.split("\n").map(a => strNoAccent(a.toLowerCase())))
+let lang
+let url
 
 module.exports = {
 	settings: {},
@@ -34,12 +45,12 @@ module.exports = {
 				playerStatesByPeerId = this.settings.milestone.playerStatesByPeerId
 				currentPlayerPeerId = this.settings.milestone.currentPlayerPeerId
 				wordsNumber = this.settings.milestone.usedWordCount ?? 0
+				lang = this.settings.rules.dictionaryId.value
 
 				if(state != this.settings.milestone.name) {
 					if(this.settings.milestone.name == 'seating') {
 						console.log("💣 Partie réinitialisée !")
 						wordsExcluded = []
-						wordsNumber = 0
 
 						client.emit("joinRound")
 					} else if(this.settings.milestone.name == 'round') {
@@ -49,6 +60,10 @@ module.exports = {
 					state = this.settings.milestone.name
 				}
 				break
+			case 'setRules':
+				lang = data[1].dictionaryId
+				url = null
+				break
 			case 'correctWord':
 				playerStatesByPeerId[data[1].playerPeerId] = data[1]
 				break
@@ -56,6 +71,17 @@ module.exports = {
 
 		if(this.settings.milestone.name == 'seating')
 			return
+
+		if(!url) {
+			url = URLs[lang]
+
+			let result = await fetch(url)
+				.then(a => a.text())
+
+			wordlist = result.split("\n").map(a => strNoAccent(a.toLowerCase()))
+
+			console.log(`📚 La liste '${this.settings.rules.dictionaryId.items.find(a => a.value === lang)?.label}' a été téléchargée`)
+		}
 
 		if((data[0] == 'nextTurn' || data[0] == 'setMilestone' || data[0] == 'failWord') && currentPlayerPeerId === this.settings.selfPeerId) {
 			if(data[0] == 'failWord') {

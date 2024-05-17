@@ -110,7 +110,7 @@ async function main() {
 				let datas = Object.getOwnPropertyNames(data[1])
 
 				for(let d of datas) {
-					bombPartyEngine.settings.rules[d] = popSauceEngine.settings.rules[d] = data[1][d]
+					bombPartyEngine.settings.rules[d].value = popSauceEngine.settings.rules[d].value = data[1][d]
 				}
 				break
 			case 'setMilestone':
