@@ -12,6 +12,7 @@ class Connection {
 		this.on_event = () => {}
 		this.on_ready = () => {}
 		this.on_initialize = () => {}
+		this._event = () => {}
 
 		this.client.on('connectFailed', (err) => {
 			console.error("Erreur de connexion au serveur : " + err)
@@ -28,6 +29,10 @@ class Connection {
 			connection.on('message', (data) => {
 				if(data.binaryData) {
 					this.on_event({ binary: data.binaryData })
+
+					if(typeof this._event === 'function') {
+						this._event({ binary: data.binaryData })
+					}
 					return
 				}
 
@@ -62,6 +67,10 @@ class Connection {
 					case 42: // Events
 					case 451:
 						this.on_event(received)
+
+						if(typeof this._event === 'function') {
+							this._event(received)
+						}
 						break
 					case 430:
 						console.log("Nom du serveur : " + received[0].roomEntry.name)
@@ -97,6 +106,17 @@ class Connection {
 
 	emit(...data) {
 		this.connection.send("42" + JSON.stringify(data))
+	}
+
+	awaitEvent(filter = () => true) {
+		return new Promise(resolve =>
+			this._event = (data) => {
+				if(filter(data)) {
+					resolve(data)
+					this._event = null
+				}
+			}
+		)
 	}
 }
 

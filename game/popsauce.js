@@ -1,9 +1,12 @@
 let state = "seating"
+let lang = ""
 
 module.exports = {
 	settings: {},
 
-	handler(client, data) {
+	async handler(client, data) {
+		if(data.binary) return
+
 		// Mise à jour des variables
 		switch(data[0]) {
 			case 'setMilestone':
@@ -25,8 +28,27 @@ module.exports = {
 				}
 
 				break
-		}
+			case 'setup':
+				lang = data[1].rules.dictionaryId.value
+				break
+			case 'setDictionary':
+				lang = data[1].dictionaryId
+				break
+			case 'startChallenge':
+				if(data[1].image) {
+					console.log("Image detected")
 
-		console.log(data)
+					let binary = await client.awaitEvent(d => d.binary)
+
+					console.log(binary)
+				} else {
+					console.log(data[1])
+				}
+
+				console.log(`QUESTION: ${data[1].prompt}`)
+				break
+			case 'endChallenge':
+				break
+		}
 	}
 }
