@@ -1,4 +1,7 @@
 {
 	"nickname": "JKLNode",
-	"use_same_token": true
+	"use_same_token": true,
+	"popsauce": {
+		"api": "http://localhost:5000"
+	}
 }

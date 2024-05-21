@@ -1,4 +1,5 @@
 const delay = require('timers/promises').setTimeout
+const { popsauce } = require('../config.json')
 
 let state = "seating"
 let playerStatesByPeerId = {}
@@ -53,7 +54,7 @@ module.exports = {
 
 					let { binary } = await client.awaitEvent(d => d.binary)
 
-					let results = await fetch("http://192.168.1.27:5000/api/searchImage", {
+					let results = await fetch(`${popsauce.api}/api/searchImage`, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
