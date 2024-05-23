@@ -83,10 +83,14 @@ module.exports = {
 					console.log(results)
 
 					for(let result of results) {
-						client.emit("submitGuess", result.substring(0, 50))
+						client.emit("submitGuess", result.substring(0, 50).toLowerCase())
 
-						if(playerStatesByPeerId[selfPeerId]?.hasFoundSource)
+						await client.awaitEvent(d => d[0] === 'setPlayerState' && d[1] === selfPeerId)
+
+						if(playerStatesByPeerId[selfPeerId]?.hasFoundSource) {
+							console.log(`✅ Trouvé : ${result}`)
 							break
+						}
 
 						await delay(100)
 					}
