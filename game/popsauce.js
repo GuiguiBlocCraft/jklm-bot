@@ -17,11 +17,6 @@ module.exports = {
 			case 'setMilestone':
 				if(data[1].milestone) playerStatesByPeerId = data[1].milestone.playerStatesByPeerId ?? {}
 
-				if(!state) {
-					state = this.settings.milestone.name
-					break
-				}
-
 				if(state != this.settings.milestone.name) {
 					if(this.settings.milestone.name == 'seating') {
 						console.log("🥤 Partie réinitialisée !")
@@ -39,9 +34,10 @@ module.exports = {
 				playerStatesByPeerId[data[1]] = data[2]
 				break
 			case 'setup':
-				lang = data[1].rules.dictionaryId.value
-				playerStatesByPeerId = data[1].milestone.playerStatesByPeerId ?? {}
+				lang = this.settings.rules.dictionaryId.value
+				playerStatesByPeerId = this.settings.milestone.playerStatesByPeerId ?? {}
 				selfPeerId = data[1].selfPeerId
+				state = this.settings.milestone.name
 				break
 			case 'setDictionary':
 				lang = data[1].dictionaryId
