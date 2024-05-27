@@ -44,54 +44,64 @@ module.exports = {
 				break
 			case 'startChallenge':
 				let question = data[1].prompt
+				let binaryData = null
+
+				if(data[1].image)
+					binaryData = await client.awaitEvent(d => d.binary)
+
+				let route = null
+				let body = null
 
 				if(data[1].image) {
-					console.log("Image detected")
-
-					let { binary } = await client.awaitEvent(d => d.binary)
-
-					let results = await fetch(`${popsauce.api}/api/searchImage`, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify({
-							"Prompt": question,
-							"Text": "",
-							"ImageData": binary.toString('base64'),
-							"ImageType": data[1].image.type,
-							"Language": lang
-						})
-					})
-						.then(a => a.json())
-						.catch(() => {})
-
-					if(!results) {
-						console.error("❌ Une erreur s'est produite sur l'API")
-						return
-					}
-
-					if(results.length === 0) {
-						console.log("❌ Aucun résultat")
-						return
-					}
-
-					console.log(results)
-
-					for(let result of results) {
-						client.emit("submitGuess", result.substring(0, 50).toLowerCase())
-
-						await client.awaitEvent(d => d[0] === 'setPlayerState' && d[1] === selfPeerId)
-
-						if(playerStatesByPeerId[selfPeerId]?.hasFoundSource) {
-							console.log(`✅ Trouvé : ${result}`)
-							break
-						}
-
-						await delay(100)
+					route = "searchImage"
+					body = {
+						"Prompt": question,
+						"ImageData": binaryData.binary.toString('base64'),
+						"ImageType": data[1].image.type,
+						"Language": lang
 					}
 				} else {
-					console.log(data[1])
+					route = "askQuestion"
+					body = {
+						"Prompt": question,
+						"Text": data[1].text,
+						"Language": lang
+					}
+				}
+
+				let results = await fetch(`${popsauce.api}/api/${route}`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(body)
+				})
+					.then(a => a.json())
+					.catch(() => {})
+
+				if(!results) {
+					console.error("❌ Une erreur s'est produite sur l'API")
+					return
+				}
+
+				if(results.length === 0) {
+					console.log("❌ Aucun résultat")
+					return
+				}
+
+				console.log(results)
+
+				for(let result of results) {
+					client.emit("submitGuess", result.substring(0, 50).toLowerCase())
+
+					await client.awaitEvent(d => d[0] === 'setPlayerState' && d[1] === selfPeerId)
+
+					if(playerStatesByPeerId[selfPeerId]?.hasFoundSource) {
+						console.log(`✅ Trouvé : ${result}`)
+						break
+					}
+
+					await delay(100)
 				}
 				break
 			case 'endChallenge':
