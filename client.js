@@ -1,1 +1,0 @@
-await fetch("http://localhost:3000/captcha", { method: 'POST', body: await grecaptcha.execute('6LdzYGslAAAAACxOZaQA5J0CxlfdJQUdWvJYoAFM', { action: 'joinRoom' }) })
