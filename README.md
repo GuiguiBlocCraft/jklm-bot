@@ -11,7 +11,7 @@ Cet outil ne respecte évidemment pas les règles d'utilisations de JKLM.fun, je
 
 ## Installation
 
-Vous devez tout d'abord installer les dépendances avant de lancer l'application JavaScript.
+Vous devez tout d'abord installer les dépendances avant de lancer l'application NodeJS.
 
 ```sh
 npm install
@@ -37,7 +37,9 @@ node index.js
 
 ## Mise en place
 
-Il faut savoir que JKLM.fun possède un système de Captcha par Google. Pour ce faire, vous devez exécuter le script JavaScript ci-dessous depuis une Room.
+*Démarrer l'application NodeJS avant de passer à l'étape suivante.*
+
+Il faut savoir que JKLM.fun possède un système de Captcha par Google
 
 Pour l'injection, ouvrir la console de votre navigateur (`F12` ou `Ctrl + Shift + I`) et copier-coller le code ci-dessous dans votre navigateur.
 
