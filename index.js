@@ -18,7 +18,7 @@ const clientRoom = new Room()
 const clientGame = new Game()
 const app = express()
 
-let roomCode = (process.argv[2] ?? process.env.ROOM_CODE)?.toUpperCase()
+const roomCode = (process.argv[2] ?? process.env.ROOM_CODE)?.toUpperCase()
 
 // Argument pour le code
 if(!roomCode) {
@@ -163,7 +163,7 @@ app.post('/captcha', function(req, res) {
 })
 
 const webServer = app.listen(3000, '127.0.0.1', function() {
-	console.log("Veuillez copier le code situé dans 'client.js' pour envoyer le Captcha.")
+	console.log("Port ouvert sur http://localhost:3000 pour le Captcha.")
 })
 
 function getUserToken() {
