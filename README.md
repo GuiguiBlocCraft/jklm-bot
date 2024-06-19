@@ -4,6 +4,9 @@ Bot non-officiel pour **[JKLM.fun](https://jklm.fun/)**, complètement reverse e
 
 Support des deux jeux disponibles, à savoir **BombParty** et **PopSauce** ([voir plus bas pour l'installation](#comment-jouer-à-popsauce-))
 
+> [!CAUTION] Suite à la dernière mise à jour de JKLM.fun qui apporte de nouvelle fonctionnalitée, une modification sur le site fait que le bot ne fonctionne plus aujourd'hui. Si vous avez une idée pour contourner ça, faites-le moi savoir.
+
+
 ## Mise en garde
 
 Cet outil ne respecte évidemment pas les règles d'utilisations de JKLM.fun, je ne serai pas responsable des bannissements.
