@@ -55,11 +55,6 @@ async function main() {
 
 	settings.urlRoom = result.url
 
-	// Captcha de Google
-	result = await fetch("https://www.google.com/recaptcha/api2/reload?k=6LdzYGslAAAAACxOZaQA5J0CxlfdJQUdWvJYoAFM", {
-		method: 'POST'
-	}).then(a => a.text())
-
 	console.log("Connexion au serveur : " + settings.urlRoom)
 	clientRoom.initialize(settings)
 	clientGame.initialize(settings)
